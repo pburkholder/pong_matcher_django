@@ -160,7 +160,7 @@ Now pretend that you've got back to your desk and need to enter the result:
 ```bash
 curl -v -H "Content-Type: application/json" -X POST $HOST/results -d '
 {
-    "match_id":"841f5b63-b4e4-4fbf-892d-d686e230f720",
+    "match_id":"thematchidyoureceived",
     "winner":"andrew",
     "loser":"navratilova"
 }'
@@ -207,7 +207,7 @@ Now pretend that you've got back to your desk and need to enter the result:
 ```powershell
 irm -v -ContentType "application/json" -Method POST -Uri $CFHOST/results -Body '
 { 
-    "match_id":"8cc398d5-94a0-4f86-96ec-32c95ff55b30", 
+    "match_id":"thematchidyoureceived",
     "winner":"andrew", 
     "loser":"navratilova"
 }'
