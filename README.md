@@ -33,10 +33,16 @@ Push the app. Its manifest assumes you called your ClearDB instance 'mysql'.
 cf push -n mysubdomain
 ```
 
-Export the test host
+Export the test host for your shell:
 
 ```bash
 export HOST=http://mysubdomain.cfapps.io
+```
+
+or powershell:
+
+```powershell
+$CFHOST="http://mysubdomain.cfapps.io"
 ```
 
 Now follow the [interaction instructions](#interaction-instructions).
@@ -119,6 +125,8 @@ be sure to export the test host with port 5000 instead of 8000.
 
 ## Interaction instructions
 
+If you're using Powershell, follow the [Powershell interaction instructions](#powershell-interaction-instructions)
+
 Start by clearing the database from any previous tests.  You should get a 200.
 
 ```bash
@@ -152,13 +160,60 @@ Now pretend that you've got back to your desk and need to enter the result:
 ```bash
 curl -v -H "Content-Type: application/json" -X POST $HOST/results -d '
 {
-    "match_id":"thematchidyoureceived",
+    "match_id":"841f5b63-b4e4-4fbf-892d-d686e230f720",
     "winner":"andrew",
     "loser":"navratilova"
 }'
 ```
 
 You should get a 201 Created response.
+
+Future requests with different player IDs should not cause a match with someone
+who has already played. The program is not yet useful enough to
+allow pairs who've already played to play again.
+
+## Powershell interaction instructions
+
+Start by clearing the database from any previous tests.  You should get a 200.
+
+```powershell
+irm -Method DELETE $CFHOST/all
+```
+
+Then request a match, providing both a request ID and player ID. Again, you
+should get a 200.
+
+```powershell
+irm -ContentType "application/json" -Method PUT -Uri $CFHOST/match_requests/firstrequest -Body '{"player":"andrew"}' 
+```
+
+Now pretend to be someone else requesting a match:
+
+```powershell
+irm -ContentType "application/json" -Method PUT -Uri $CFHOST/match_requests/secondrequest -Body '{"player":"navratilova"}' 
+```
+
+Let's check on the status of our first match request:
+
+```powershell
+irm $CFHOST/match_requests/firstrequest
+```
+
+The bottom of the output should show you the match_id. You'll need this in the
+next step.
+
+Now pretend that you've got back to your desk and need to enter the result:
+
+```powershell
+irm -v -ContentType "application/json" -Method POST -Uri $CFHOST/results -Body '
+{ 
+    "match_id":"8cc398d5-94a0-4f86-96ec-32c95ff55b30", 
+    "winner":"andrew", 
+    "loser":"navratilova"
+}'
+```
+
+You should get a response including, `VERBOSE: received 0-byte response of content type text/html`.
 
 Future requests with different player IDs should not cause a match with someone
 who has already played. The program is not yet useful enough to
